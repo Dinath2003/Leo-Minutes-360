@@ -153,51 +153,77 @@ function initParticles() {
 
   // ---- Comet (falling streak from top) ----
   class Comet {
-    constructor(init) { this.reset(init); }
+    constructor(init = false) { this.reset(init); }
+
     reset(init = false) {
-      this.x    = rand(0, W);
-      this.y    = init ? rand(-200, 0) : rand(-80, -10);
-      this.len  = rand(60, 160);
-      this.spd  = rand(6, 18);
-      this.ang  = rand(Math.PI * 0.35, Math.PI * 0.65); // mostly downward
-      this.vx   = Math.cos(this.ang) * this.spd * rand(-0.3, 0.3);
-      this.vy   = Math.sin(this.ang) * this.spd;
-      this.size = rand(0.8, 2.0);
-      this.life = 0;
-      this.maxLife = randI(50, 130);
+      this.x = rand(W * 0.05, W * 0.95);
+      this.y = init ? rand(-H, 0) : rand(-120, -20);
+      const angle = rand(-0.22, 0.22);
+      const speed = rand(4.5, 10);
+      this.vx = Math.sin(angle) * speed;
+      this.vy = Math.cos(angle) * speed;
+      this.tailLen = rand(120, 280);
+      this.size = rand(1.5, 3.2);
       this.alpha = rand(0.55, 0.95);
+      this.life = 0;
+      this.maxLife = randI(60, 140);
+      this.hue = 210; // Silver base (0% sat = pure grey/white)
     }
+
     update() {
-      this.life++;
       this.x += this.vx;
       this.y += this.vy;
-      if (this.life >= this.maxLife || this.y > H + 50 || this.x < -50 || this.x > W + 50) this.reset();
+      this.life++;
+      if (this.y > H + this.tailLen || this.x < -this.tailLen || this.x > W + this.tailLen || this.life > this.maxLife) {
+        this.reset(false);
+      }
     }
+
     draw() {
-      const p = this.life / this.maxLife;
-      const a = this.alpha * (1 - p);
-      // tail: from transparent → bright white tip
-      const tailX = this.x - Math.cos(this.ang) * this.len;
-      const tailY = this.y - Math.sin(this.ang) * this.len;
-      const g = ctx.createLinearGradient(tailX, tailY, this.x, this.y);
-      g.addColorStop(0, `rgba(255, 255, 255, 0)`);
-      g.addColorStop(0.6, `rgba(220, 230, 240, ${a * 0.35})`);
-      g.addColorStop(1,   `rgba(255, 255, 255, ${a})`);
-      ctx.beginPath();
-      ctx.moveTo(tailX, tailY);
-      ctx.lineTo(this.x, this.y);
-      ctx.strokeStyle = g;
-      ctx.lineWidth = this.size;
+      const lifeFrac = this.life / this.maxLife;
+      const fadeIn = Math.min(this.life / 20, 1);
+      const fadeOut = lifeFrac > 0.75 ? 1 - (lifeFrac - 0.75) / 0.25 : 1;
+      const opacity = this.alpha * fadeIn * fadeOut;
+      if (opacity <= 0.01) return;
+
+      const len = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+      const nx = -this.vx / len;
+      const ny = -this.vy / len;
+      const tx = this.x + nx * this.tailLen;
+      const ty = this.y + ny * this.tailLen;
+
+      const grad = ctx.createLinearGradient(this.x, this.y, tx, ty);
+      grad.addColorStop(0,    `hsla(${this.hue}, 0%, 95%, ${opacity})`);
+      grad.addColorStop(0.05, `hsla(${this.hue}, 0%, 85%, ${opacity * 0.85})`);
+      grad.addColorStop(0.25, `hsla(${this.hue}, 0%, 65%, ${opacity * 0.40})`);
+      grad.addColorStop(0.6,  `hsla(${this.hue}, 0%, 35%, ${opacity * 0.12})`);
+      grad.addColorStop(1,    `hsla(${this.hue}, 0%, 15%, 0)`);
+
+      ctx.save();
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = this.size * 2;
       ctx.lineCap = 'round';
-      ctx.stroke();
-      // bright tip glow
-      const tipG = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 4);
-      tipG.addColorStop(0, `rgba(255, 255, 255, ${a * 0.9})`);
-      tipG.addColorStop(1, `rgba(255, 255, 255, 0)`);
+      ctx.shadowBlur = 14;
+      ctx.shadowColor = `rgba(255, 255, 255, ${opacity * 0.5})`;
       ctx.beginPath();
-      ctx.arc(this.x, this.y, this.size * 4, 0, Math.PI * 2);
-      ctx.fillStyle = tipG;
+      ctx.moveTo(this.x, this.y);
+      ctx.lineTo(tx, ty);
+      ctx.stroke();
+      ctx.restore();
+
+      // Nucleus dot
+      ctx.save();
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = `rgba(255, 255, 255, ${opacity * 0.8})`;
+      const nGrad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 2.5);
+      nGrad.addColorStop(0,   `hsla(0, 0%, 100%, ${opacity})`);
+      nGrad.addColorStop(0.4, `hsla(${this.hue}, 0%, 90%, ${opacity * 0.75})`);
+      nGrad.addColorStop(1,   `hsla(${this.hue}, 0%, 60%, 0)`);
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size * 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = nGrad;
       ctx.fill();
+      ctx.restore();
     }
   }
 
