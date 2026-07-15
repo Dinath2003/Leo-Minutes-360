@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- Styling Stylesheets -->
-  <link rel="stylesheet" href="style.css?v=1.1">
+  <link rel="stylesheet" href="style.css?v=1.2">
   
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -22,16 +22,25 @@
   <div class="login-layout">
 
 
-    <!-- Blue Fire Particle Canvas Backdrop -->
+    <!-- Green Ocean Fire Canvas Backdrop + Rising Bubbles -->
     <div class="login-bg">
       <canvas id="particle-canvas"></canvas>
+      <!-- Ambient rising bubbles (Leo LMS) -->
+      <div class="bubble bubble-1" aria-hidden="true"></div>
+      <div class="bubble bubble-2" aria-hidden="true"></div>
+      <div class="bubble bubble-3" aria-hidden="true"></div>
+      <div class="bubble bubble-4" aria-hidden="true"></div>
+      <div class="bubble bubble-5" aria-hidden="true"></div>
+      <div class="bubble bubble-6" aria-hidden="true"></div>
+      <div class="bubble bubble-7" aria-hidden="true"></div>
+      <div class="bubble bubble-8" aria-hidden="true"></div>
     </div>
 
     <!-- 3D Centered Content Wrapper -->
-    <div class="login-content" id="login-content-3d">
+    <div class="login-content page-enter" id="login-content-3d">
       
-      <!-- Glassmorphic card with specular shimmer & orbital depths -->
-      <div class="login-card" id="login-card-3d">
+      <!-- Glassmorphic card with specular shimmer, orbital depths & caustics -->
+      <div class="login-card water-effect" id="login-card-3d">
         
         <!-- Glassmorphism Specular Shimmer Layer -->
         <div class="login-card-shimmer" aria-hidden="true"></div>
@@ -53,13 +62,13 @@
         <!-- Form Fields matching Image 2 structure exactly -->
         <form class="login-form stagger-enter" id="login-form" autocomplete="on" novalidate>
           
-          <!-- Role Toggle -->
+          <!-- Role Toggle with hover-lift -->
           <div class="login-role-toggle">
-            <button type="button" class="active" data-role="district" id="role-district">
+            <button type="button" class="active hover-scale" data-role="district" id="role-district">
               <i data-lucide="shield" style="width:14px;height:14px;margin-right:6px;vertical-align:-2px"></i>
               District
             </button>
-            <button type="button" data-role="club" id="role-club">
+            <button type="button" class="hover-scale" data-role="club" id="role-club">
               <i data-lucide="building-2" style="width:14px;height:14px;margin-right:6px;vertical-align:-2px"></i>
               Club
             </button>
@@ -101,8 +110,8 @@
           <!-- Login Error Banner -->
           <div class="login-error" id="login-error"></div>
 
-          <!-- Submit Button -->
-          <button type="submit" class="btn btn-primary btn-lg submit-button" id="submitBtn" style="width:100%;margin-top:12px">
+          <!-- Submit Button with hover-lift -->
+          <button type="submit" class="btn btn-primary btn-lg submit-button hover-lift" id="submitBtn" style="width:100%;margin-top:12px">
             <span class="btn-text">
               <i data-lucide="log-in" style="width:18px;height:18px;vertical-align:-3px;margin-right:6px"></i>
               Sign In
@@ -127,6 +136,6 @@
   </div>
 
   <!-- Interactive Script -->
-  <script src="script.js?v=1.1"></script>
+  <script src="script.js?v=1.2"></script>
 </body>
 </html>
