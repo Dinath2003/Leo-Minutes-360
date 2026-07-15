@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leo Minutes 360 - Login</title>
+  
+  <!-- Modern Premium Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Styling Stylesheets -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <!-- Replicated Login Layout Structure from Image 2 -->
+  <div class="login-layout">
+
+
+    <!-- Blue Fire Particle Canvas Backdrop -->
+    <div class="login-bg">
+      <canvas id="particle-canvas"></canvas>
+    </div>
+
+    <!-- 3D Centered Content Wrapper -->
+    <div class="login-content" id="login-content-3d">
+      
+      <!-- Glassmorphic card with specular shimmer & orbital depths -->
+      <div class="login-card" id="login-card-3d">
+        
+        <!-- Glassmorphism Specular Shimmer Layer -->
+        <div class="login-card-shimmer" aria-hidden="true"></div>
+        
+        <!-- Floating Orb Reflections -->
+        <div class="login-card-orb login-card-orb-1" aria-hidden="true"></div>
+        <div class="login-card-orb login-card-orb-2" aria-hidden="true"></div>
+
+        <!-- Portal Branding matching Image 2 -->
+        <div class="login-branding">
+          <div class="login-logo">
+            <i data-lucide="anchor"></i>
+          </div>
+          <div class="login-subtitle">Welcome to</div>
+          <h1><span class="title-white">Leo Minutes</span><br/><span class="title-blue">360</span></h1>
+          <p class="login-desc">District &amp; Club Minutes Collaboration Portal</p>
+        </div>
+
+        <!-- Form Fields matching Image 2 structure exactly -->
+        <form class="login-form" id="login-form" autocomplete="on" novalidate>
+          
+          <!-- Role Toggle -->
+          <div class="login-role-toggle">
+            <button type="button" class="active" data-role="district" id="role-district">
+              <i data-lucide="shield" style="width:14px;height:14px;margin-right:6px;vertical-align:-2px"></i>
+              District
+            </button>
+            <button type="button" data-role="club" id="role-club">
+              <i data-lucide="building-2" style="width:14px;height:14px;margin-right:6px;vertical-align:-2px"></i>
+              Club
+            </button>
+          </div>
+
+          <!-- Email Input Group -->
+          <div class="form-group">
+            <label class="form-label" for="login-email">Email Address</label>
+            <div style="position:relative">
+              <i data-lucide="mail" class="input-icon"></i>
+              <input type="email" class="form-input" id="login-email" placeholder="Enter your email" required value="admin@leo.org" />
+            </div>
+            <span class="error-message" id="email-error" aria-live="polite"></span>
+          </div>
+
+          <!-- Password Input Group -->
+          <div class="form-group">
+            <label class="form-label" for="login-password">Password</label>
+            <div style="position:relative">
+              <i data-lucide="lock" class="input-icon"></i>
+              <input type="password" class="form-input" id="login-password" placeholder="Enter your password" required value="admin123" />
+              
+              <!-- Password Show/Hide Toggle -->
+              <button type="button" class="password-toggle" id="passwordToggle" aria-label="Show password" aria-pressed="false" tabindex="0">
+                <i data-lucide="eye" class="eye-icon eye-closed"></i>
+                <i data-lucide="eye-off" class="eye-icon eye-open hidden"></i>
+              </button>
+            </div>
+            
+            <span class="error-message" id="password-error" aria-live="polite"></span>
+            
+            <!-- Caps Lock Warning -->
+            <div id="capsLockWarning" class="caps-lock-warning hidden">
+              <i data-lucide="alert-triangle" style="width:14px;height:14px"></i>
+              <span>Caps Lock is ON</span>
+            </div>
+          </div>
+
+          <!-- Login Error Banner -->
+          <div class="login-error" id="login-error"></div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="btn btn-primary btn-lg submit-button" id="submitBtn" style="width:100%;margin-top:12px">
+            <span class="btn-text">
+              <i data-lucide="log-in" style="width:18px;height:18px;vertical-align:-3px;margin-right:6px"></i>
+              Sign In
+            </span>
+            <span class="btn-loader hidden">
+              <svg class="spinner" viewBox="0 0 50 50">
+                <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+              </svg>
+            </span>
+          </button>
+        </form>
+
+        <!-- Footer Notice -->
+        <footer class="portal-footer">
+          <p>Secured by <strong>LeoLock™</strong> Systems</p>
+          <p class="copyright">&copy; 2026 LeoMinutes360. All rights reserved.</p>
+        </footer>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Interactive Script -->
+  <script src="script.js"></script>
+</body>
+</html>
