@@ -415,13 +415,9 @@ function initParticles() {
     }
 
     draw() {
-      const t = this.life / this.maxLife;
-      // Palette mapping: Frost (228), Chrome (227), Pewter (247)
-      const hue = t < 0.35 ? 228 : t < 0.75 ? 227 : 247;
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-      // Low saturation (10%) to get silver sparks instead of blue sparks
-      ctx.fillStyle = `hsla(${hue}, 10%, 80%, ${this.alpha * 0.95})`;
+      ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha * 0.95})`;
       ctx.fill();
     }
   }
@@ -470,13 +466,10 @@ function initParticles() {
     }
 
     draw() {
-      const t = this.life / this.maxLife;
-      const hue = t < 0.25 ? 228 : t < 0.60 ? 227 : 247;
       const g = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.currentR);
-      // Low saturation (12%, 8%) to draw frosted/silver flames
-      g.addColorStop(0,    `hsla(${hue},      12%, 75%, ${this.currentAlpha * 0.55})`);
-      g.addColorStop(0.35, `hsla(${hue},       8%, 45%, ${this.currentAlpha * 0.25})`);
-      g.addColorStop(1,    `hsla(227,          5%, 15%, 0)`);
+      g.addColorStop(0,    `rgba(255, 255, 255, ${this.currentAlpha * 0.65})`);
+      g.addColorStop(0.35, `rgba(200, 200, 205, ${this.currentAlpha * 0.28})`);
+      g.addColorStop(1,    `rgba(30, 30, 35, 0)`);
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.currentR, 0, Math.PI * 2);
       ctx.fillStyle = g;
@@ -531,19 +524,18 @@ function initParticles() {
       const ty = this.y + ny * this.tailLen;
 
       const grad = ctx.createLinearGradient(this.x, this.y, tx, ty);
-      // Low saturation (10%, 8%) for silver comets
-      grad.addColorStop(0,    `hsla(${this.hue},  10%, 92%, ${opacity})`);
-      grad.addColorStop(0.05, `hsla(${this.hue},  10%, 75%, ${opacity * 0.85})`);
-      grad.addColorStop(0.25, `hsla(${this.hue},   8%, 55%, ${opacity * 0.40})`);
-      grad.addColorStop(0.6,  `hsla(${this.hue},   6%, 35%, ${opacity * 0.12})`);
-      grad.addColorStop(1,    `hsla(${this.hue},   5%, 15%, 0)`);
+      grad.addColorStop(0,    `rgba(255, 255, 255, ${opacity})`);
+      grad.addColorStop(0.05, `rgba(240, 240, 245, ${opacity * 0.85})`);
+      grad.addColorStop(0.25, `rgba(200, 200, 205, ${opacity * 0.40})`);
+      grad.addColorStop(0.6,  `rgba(100, 100, 105, ${opacity * 0.12})`);
+      grad.addColorStop(1,    `rgba(0, 0, 0, 0)`);
 
       ctx.save();
       ctx.strokeStyle = grad;
       ctx.lineWidth = this.size * 2;
       ctx.lineCap = 'round';
       ctx.shadowBlur = 12;
-      ctx.shadowColor = `hsla(${this.hue}, 12%, 80%, ${opacity * 0.6})`;
+      ctx.shadowColor = `rgba(255, 255, 255, ${opacity * 0.6})`;
       ctx.beginPath();
       ctx.moveTo(this.x, this.y);
       ctx.lineTo(tx, ty);
@@ -552,11 +544,11 @@ function initParticles() {
 
       ctx.save();
       ctx.shadowBlur = 18;
-      ctx.shadowColor = `hsla(${this.hue}, 12%, 90%, ${opacity})`;
+      ctx.shadowColor = `rgba(255, 255, 255, ${opacity})`;
       const nGrad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 2.2);
-      nGrad.addColorStop(0,   `hsla(0, 0%, 100%, ${opacity})`);
-      nGrad.addColorStop(0.4, `hsla(${this.hue}, 12%, 85%, ${opacity * 0.75})`);
-      nGrad.addColorStop(1,   `hsla(${this.hue}, 10%, 55%, 0)`);
+      nGrad.addColorStop(0,   `rgba(255, 255, 255, ${opacity})`);
+      nGrad.addColorStop(0.4, `rgba(230, 230, 235, ${opacity * 0.75})`);
+      nGrad.addColorStop(1,   `rgba(150, 150, 150, 0)`);
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.size * 2.2, 0, Math.PI * 2);
       ctx.fillStyle = nGrad;
@@ -570,21 +562,21 @@ function initParticles() {
     const pulse = 0.65 + Math.sin(Date.now() * 0.004) * 0.35;
     const r = 26 + Math.sin(Date.now() * 0.007) * 7;
 
-    // Halo (Chrome - #9ea0a7, Carbon - #51565a)
+    // Halo (White/Light Gray)
     const outer = ctx.createRadialGradient(grav.x, grav.y, 0, grav.x, grav.y, r * 3.5);
-    outer.addColorStop(0,   `rgba(158, 160, 167, ${0.18 * pulse})`);
-    outer.addColorStop(0.5, `rgba(81, 86, 90, ${0.08 * pulse})`);
+    outer.addColorStop(0,   `rgba(255, 255, 255, ${0.16 * pulse})`);
+    outer.addColorStop(0.5, `rgba(200, 200, 205, ${0.06 * pulse})`);
     outer.addColorStop(1,   `rgba(9, 13, 18, 0)`);
     ctx.beginPath();
     ctx.arc(grav.x, grav.y, r * 3.5, 0, Math.PI * 2);
     ctx.fillStyle = outer;
     ctx.fill();
 
-    // Core (Frost -> Pewter -> Nickel)
+    // Core (Pure White -> Light Gray -> Slate Gray)
     const core = ctx.createRadialGradient(grav.x, grav.y, 0, grav.x, grav.y, r);
-    core.addColorStop(0,   `rgba(236, 239, 250, ${0.9 * pulse})`);
-    core.addColorStop(0.3, `rgba(192, 191, 198, ${0.7 * pulse})`);
-    core.addColorStop(0.7, `rgba(123, 125, 127, ${0.35 * pulse})`);
+    core.addColorStop(0,   `rgba(255, 255, 255, ${0.92 * pulse})`);
+    core.addColorStop(0.3, `rgba(220, 220, 225, ${0.72 * pulse})`);
+    core.addColorStop(0.7, `rgba(150, 150, 155, ${0.35 * pulse})`);
     core.addColorStop(1,   `rgba(81, 86, 90, 0)`);
     ctx.beginPath();
     ctx.arc(grav.x, grav.y, r, 0, Math.PI * 2);
@@ -595,7 +587,7 @@ function initParticles() {
     ctx.arc(grav.x, grav.y, 3.2, 0, Math.PI * 2);
     ctx.fillStyle = `rgba(255, 255, 255, ${0.95 * pulse})`;
     ctx.shadowBlur = 12;
-    ctx.shadowColor = 'rgba(236, 239, 250, 0.9)'; // Frost glow
+    ctx.shadowColor = 'rgba(255, 255, 255, 0.95)';
     ctx.fill();
     ctx.shadowBlur = 0;
   }
@@ -617,8 +609,8 @@ function initParticles() {
   function drawBg() {
     const W = canvas.width, H = canvas.height;
     const g = ctx.createRadialGradient(W / 2, H, 0, W / 2, H, Math.max(W, H));
-    g.addColorStop(0, '#090d12'); // Abyss
-    g.addColorStop(1, '#05070a');
+    g.addColorStop(0, '#0a0d14'); // Dark Midnight
+    g.addColorStop(1, '#030509'); // Deep Abyss
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, W, H);
   }
@@ -629,8 +621,8 @@ function initParticles() {
     const flicker = Math.sin(Date.now() * 0.006) * 0.05 + Math.cos(Date.now() * 0.013) * 0.03 + 0.95;
     const glowH = H * 0.22 * flicker;
     const g = ctx.createLinearGradient(0, H, 0, H - glowH);
-    g.addColorStop(0,   `hsla(227, 8%, 25%, ${0.48 * flicker})`); // Chrome / Carbon ground glow
-    g.addColorStop(0.4, `hsla(228, 15%, 60%, ${0.16 * flicker})`);
+    g.addColorStop(0,   `rgba(255, 255, 255, ${0.08 * flicker})`); // Soft white/gray ground glow
+    g.addColorStop(0.4, `rgba(200, 200, 200, ${0.03 * flicker})`);
     g.addColorStop(1,   `rgba(0, 0, 0, 0)`);
     ctx.fillStyle = g;
     ctx.fillRect(0, H - glowH, W, glowH);
