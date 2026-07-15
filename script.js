@@ -1,7 +1,7 @@
 // Leo Minutes 360 Login Portal
 // Interactive 3D Card Tilt + Specular Shimmer + Autonomous Blue Fire Particle Physics
 
-document.addEventListener('DOMContentLoaded', () => {
+function initializeApp() {
   // Lucide initialization
   if (window.lucide) {
     lucide.createIcons();
@@ -308,7 +308,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // 7. BLUE FIRE BACKDROP PARTICLE SIMULATION
   // ==========================================
   initParticles();
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeApp);
+} else {
+  initializeApp();
+}
 
 function initParticles() {
   const canvas = document.getElementById('particle-canvas');
@@ -368,8 +374,8 @@ function initParticles() {
   let comets = [];
 
   function seed() {
-    embers = Array.from({ length: 110 }, () => new Ember(true));
-    flames = Array.from({ length: 40 }, () => new FlameBody(true));
+    embers = Array.from({ length: 180 }, () => new Ember(true));
+    flames = Array.from({ length: 140 }, () => new FlameBody(true));
     comets = Array.from({ length: 7 }, () => new Comet(true));
   }
 
@@ -381,11 +387,11 @@ function initParticles() {
       const W = canvas.width, H = canvas.height;
       this.baseX = rand(0, W);
       this.x = this.baseX;
-      this.y = init ? rand(H * 0.2, H) : rand(H - 40, H);
-      this.size = rand(1.2, 3.6);
-      this.vy = rand(-1.2, -3.0);
+      this.y = init ? rand(H * 0.4, H) : rand(H - 30, H + 20);
+      this.size = rand(1.5, 4.0);
+      this.vy = rand(-1.8, -5.0);
       this.life = 0;
-      this.maxLife = randI(160, 310);
+      this.maxLife = randI(120, 250);
       this.alpha = 1;
       this.phase = rand(0, Math.PI * 2);
       this.frequency = rand(0.01, 0.035);
@@ -430,11 +436,11 @@ function initParticles() {
       const W = canvas.width, H = canvas.height;
       this.baseX = rand(0, W);
       this.x = this.baseX;
-      this.y = init ? rand(H * 0.6, H) : rand(H - 60, H);
-      this.r = rand(30, 80);
-      this.vy = rand(-0.8, -2.2);
+      this.y = init ? rand(H * 0.6, H) : rand(H - 40, H + 40);
+      this.r = rand(60, 150);
+      this.vy = rand(-1.0, -3.5);
       this.life = 0;
-      this.maxLife = randI(80, 150);
+      this.maxLife = randI(80, 180);
       this.alpha = rand(0.3, 0.6);
       this.phase = rand(0, Math.PI * 2);
       this.frequency = rand(0.01, 0.025);
@@ -458,8 +464,10 @@ function initParticles() {
       this.y += dy / dist * pull * 0.4;
 
       const p = this.life / this.maxLife;
-      this.currentR = this.r * (1 - p * 0.76);
-      this.currentAlpha = this.alpha * (1 - p);
+      // Shrink radius as it rises to mimic a flame tip
+      this.currentR = this.r * (1 - p * 0.85);
+      // Fade out smoothly
+      this.currentAlpha = this.alpha * Math.pow(1 - p, 1.5);
 
       if (this.life >= this.maxLife || this.y < H - H * 0.6 ||
           this.x < -this.r || this.x > canvas.width + this.r) this.reset();
@@ -467,8 +475,9 @@ function initParticles() {
 
     draw() {
       const g = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.currentR);
-      g.addColorStop(0,    `rgba(255, 255, 255, ${this.currentAlpha * 0.65})`);
-      g.addColorStop(0.35, `rgba(200, 200, 205, ${this.currentAlpha * 0.28})`);
+      g.addColorStop(0,    `rgba(255, 255, 255, ${this.currentAlpha * 0.8})`);
+      g.addColorStop(0.2,  `rgba(240, 240, 245, ${this.currentAlpha * 0.45})`);
+      g.addColorStop(0.5,  `rgba(200, 200, 205, ${this.currentAlpha * 0.15})`);
       g.addColorStop(1,    `rgba(30, 30, 35, 0)`);
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.currentR, 0, Math.PI * 2);
@@ -605,12 +614,12 @@ function initParticles() {
     grav.y += (grav.ty - grav.y) * 0.04;
   }
 
-  // Draw deep dark body bg
+  // Match body CSS gradient so screen blending works flawlessly
   function drawBg() {
     const W = canvas.width, H = canvas.height;
     const g = ctx.createRadialGradient(W / 2, H, 0, W / 2, H, Math.max(W, H));
-    g.addColorStop(0, '#0a0d14'); // Dark Midnight
-    g.addColorStop(1, '#030509'); // Deep Abyss
+    g.addColorStop(0, '#121820'); // Match Midnight body bg
+    g.addColorStop(1, '#070a0e'); // Match Abyss body bg
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, W, H);
   }
@@ -634,14 +643,14 @@ function initParticles() {
     drawBg();
 
     ctx.save();
-    ctx.globalCompositeOperation = 'screen';
+    ctx.globalCompositeOperation = 'lighter';
     comets.forEach(c => { c.update(); c.draw(); });
     ctx.restore();
 
     drawGravityOrb();
 
     ctx.save();
-    ctx.globalCompositeOperation = 'screen';
+    ctx.globalCompositeOperation = 'lighter';
     flames.forEach(f => { f.update(); f.draw(); });
     embers.forEach(e => { e.update(); e.draw(); });
     ctx.restore();
