@@ -98,7 +98,7 @@ html {
 body {
   font-family: var(--font-body);
   color: var(--color-text-primary);
-  background: radial-gradient(ellipse at center bottom, #011211 0%, #021B1A 60%, #010c0b 100%);
+  background: radial-gradient(ellipse at center bottom, #0d0f14 0%, #060709 70%, #020304 100%);
   min-height: 100vh;
   overflow: hidden;
   display: flex;
@@ -888,8 +888,8 @@ body {
 .bubble {
   position: absolute;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, rgba(0, 223, 129, 0.12), rgba(3, 98, 76, 0.04));
-  border: 1px solid rgba(0, 223, 129, 0.06);
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.10), rgba(200, 210, 220, 0.03));
+  border: 1px solid rgba(255, 255, 255, 0.07);
   pointer-events: none;
   z-index: 0;
 }
