@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leo Minutes 360 — District Dashboard</title>
+  <meta name="description" content="Leo District Club Performance Monitoring Dashboard — track all 20 Leo Clubs across 10 activity panels.">
+
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body class="dashboard-body">
+
+  <!-- ================================================
+       SIDEBAR NAVIGATION
+  ================================================ -->
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+
+    <!-- Sidebar Logo / Branding -->
+    <div class="sidebar-brand">
+      <div class="sidebar-logo">
+        <i data-lucide="anchor"></i>
+      </div>
+      <div class="sidebar-brand-text">
+        <span class="brand-name">LeoMinutes</span>
+        <span class="brand-tag">360</span>
+      </div>
+      <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close sidebar">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+
+    <!-- Navigation Links -->
+    <nav class="sidebar-nav">
+      <div class="nav-group">
+        <span class="nav-group-label">Overview</span>
+        <a href="#overview" class="nav-item active" id="nav-overview" data-panel="overview">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard</span>
+          <span class="nav-badge nav-badge-blue" id="badge-overview"></span>
+        </a>
+      </div>
+
+      <div class="nav-group">
+        <span class="nav-group-label">Monitoring Panels</span>
+
+        <a href="#mylci" class="nav-item" id="nav-mylci" data-panel="mylci">
+          <i data-lucide="shield-check"></i>
+          <span>MyLCI</span>
+          <span class="nav-badge" id="badge-mylci"></span>
+        </a>
+
+        <a href="#myleo" class="nav-item" id="nav-myleo" data-panel="myleo">
+          <i data-lucide="globe"></i>
+          <span>MyLeo</span>
+          <span class="nav-badge" id="badge-myleo"></span>
+        </a>
+
+        <a href="#bank_account" class="nav-item" id="nav-bank_account" data-panel="bank_account">
+          <i data-lucide="landmark"></i>
+          <span>Bank Account</span>
+          <span class="nav-badge" id="badge-bank_account"></span>
+        </a>
+
+        <a href="#general_meetings" class="nav-item" id="nav-general_meetings" data-panel="general_meetings">
+          <i data-lucide="users"></i>
+          <span>General Meetings</span>
+          <span class="nav-badge" id="badge-general_meetings"></span>
+        </a>
+
+        <a href="#board_meetings" class="nav-item" id="nav-board_meetings" data-panel="board_meetings">
+          <i data-lucide="clipboard-list"></i>
+          <span>Board Meetings</span>
+          <span class="nav-badge" id="badge-board_meetings"></span>
+        </a>
+
+        <a href="#projects" class="nav-item" id="nav-projects" data-panel="projects">
+          <i data-lucide="rocket"></i>
+          <span>Projects</span>
+          <span class="nav-badge" id="badge-projects"></span>
+        </a>
+
+        <a href="#membership" class="nav-item" id="nav-membership" data-panel="membership">
+          <i data-lucide="user-plus"></i>
+          <span>Membership</span>
+          <span class="nav-badge" id="badge-membership"></span>
+        </a>
+
+        <a href="#orientations" class="nav-item" id="nav-orientations" data-panel="orientations">
+          <i data-lucide="graduation-cap"></i>
+          <span>Orientations</span>
+          <span class="nav-badge" id="badge-orientations"></span>
+        </a>
+
+        <a href="#district_events" class="nav-item" id="nav-district_events" data-panel="district_events">
+          <i data-lucide="calendar-days"></i>
+          <span>District Events</span>
+          <span class="nav-badge" id="badge-district_events"></span>
+        </a>
+
+        <a href="#md_participation" class="nav-item" id="nav-md_participation" data-panel="md_participation">
+          <i data-lucide="globe-2"></i>
+          <span>MD Participation</span>
+          <span class="nav-badge" id="badge-md_participation"></span>
+        </a>
+      </div>
+
+      <div class="nav-group">
+        <span class="nav-group-label">Management</span>
+
+        <a href="#clubs" class="nav-item" id="nav-clubs" data-panel="clubs">
+          <i data-lucide="building-2"></i>
+          <span>Leo Clubs</span>
+        </a>
+
+        <a href="#reports" class="nav-item" id="nav-reports" data-panel="reports">
+          <i data-lucide="bar-chart-3"></i>
+          <span>Reports</span>
+        </a>
+
+        <a href="#settings" class="nav-item" id="nav-settings" data-panel="settings">
+          <i data-lucide="settings"></i>
+          <span>Settings</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Sidebar User Info -->
+    <div class="sidebar-user">
+      <div class="sidebar-user-avatar" id="sidebar-avatar">
+        <i data-lucide="user"></i>
+      </div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name" id="sidebar-user-name">Loading...</div>
+        <div class="sidebar-user-role" id="sidebar-user-role">—</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Sidebar Overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ================================================
+       MAIN CONTENT AREA
+  ================================================ -->
+  <main class="main-content" id="main-content">
+
+    <!-- ---- TOP HEADER BAR ---- -->
+    <header class="topbar" id="topbar">
+      <div class="topbar-left">
+        <button class="topbar-menu-btn" id="sidebarToggleBtn" aria-label="Toggle sidebar">
+          <i data-lucide="menu"></i>
+        </button>
+        <div class="topbar-breadcrumb">
+          <span id="topbar-section-label">District Dashboard</span>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <!-- Leoistic Year Badge -->
+        <div class="topbar-year-badge" id="topbar-year">
+          <i data-lucide="calendar"></i>
+          <span>2025–2026</span>
+        </div>
+
+        <!-- Notification Bell -->
+        <button class="topbar-icon-btn" id="notifBtn" aria-label="Notifications">
+          <i data-lucide="bell"></i>
+          <span class="notif-dot" id="notif-dot" aria-label="Unread notifications"></span>
+        </button>
+
+        <!-- User Avatar + Dropdown -->
+        <div class="topbar-user-menu" id="topbarUserMenu">
+          <button class="topbar-avatar-btn" id="topbarAvatarBtn" aria-label="User menu">
+            <div class="topbar-avatar" id="topbar-avatar">
+              <i data-lucide="user"></i>
+            </div>
+            <div class="topbar-user-text">
+              <span class="topbar-user-name" id="topbar-user-name">Loading...</span>
+              <span class="topbar-user-role-badge" id="topbar-role-badge">—</span>
+            </div>
+            <i data-lucide="chevron-down" style="width:14px;height:14px;opacity:0.5"></i>
+          </button>
+
+          <div class="topbar-dropdown" id="topbarDropdown">
+            <a href="#settings" class="topbar-dropdown-item" id="dd-settings">
+              <i data-lucide="settings"></i> Settings
+            </a>
+            <div class="topbar-dropdown-divider"></div>
+            <button class="topbar-dropdown-item topbar-dropdown-danger" id="logoutBtn">
+              <i data-lucide="log-out"></i> Sign Out
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ---- NOTIFICATION DRAWER ---- -->
+    <div class="notif-drawer" id="notifDrawer" role="dialog" aria-label="Notifications">
+      <div class="notif-drawer-header">
+        <h3>Notifications</h3>
+        <button class="notif-mark-all" id="markAllReadBtn">Mark all read</button>
+      </div>
+      <div class="notif-drawer-body" id="notifList">
+        <!-- Dynamically populated -->
+      </div>
+    </div>
+    <div class="notif-backdrop" id="notifBackdrop"></div>
+
+    <!-- ================================================
+         PAGE SECTIONS (single-page navigation)
+    ================================================ -->
+
+    <!-- ---- OVERVIEW SECTION ---- -->
+    <section class="page-section active" id="section-overview">
+
+      <!-- Welcome Banner -->
+      <div class="welcome-banner">
+        <div class="welcome-text">
+          <h1 class="welcome-heading">District Performance Overview</h1>
+          <p class="welcome-sub">Monitoring all 20 Leo Clubs · Leoistic Year <span id="current-year-label">2025–2026</span></p>
+        </div>
+        <div class="welcome-actions">
+          <button class="btn btn-outline-glass" id="exportBtn">
+            <i data-lucide="download"></i> Export Report
+          </button>
+        </div>
+      </div>
+
+      <!-- Top KPI Bar -->
+      <div class="kpi-bar" id="kpi-bar">
+        <div class="kpi-card" id="kpi-clubs">
+          <div class="kpi-icon kpi-icon-blue"><i data-lucide="building-2"></i></div>
+          <div class="kpi-body">
+            <div class="kpi-value" id="kpi-total-clubs">20</div>
+            <div class="kpi-label">Active Clubs</div>
+          </div>
+        </div>
+        <div class="kpi-card" id="kpi-score">
+          <div class="kpi-icon kpi-icon-green"><i data-lucide="trophy"></i></div>
+          <div class="kpi-body">
+            <div class="kpi-value" id="kpi-avg-score">—%</div>
+            <div class="kpi-label">Avg District Score</div>
+          </div>
+        </div>
+        <div class="kpi-card" id="kpi-pending">
+          <div class="kpi-icon kpi-icon-orange"><i data-lucide="clock"></i></div>
+          <div class="kpi-body">
+            <div class="kpi-value" id="kpi-pending-verif">—</div>
+            <div class="kpi-label">Pending Verification</div>
+          </div>
+        </div>
+        <div class="kpi-card" id="kpi-overdue">
+          <div class="kpi-icon kpi-icon-red"><i data-lucide="alert-circle"></i></div>
+          <div class="kpi-body">
+            <div class="kpi-value" id="kpi-overdue-count">—</div>
+            <div class="kpi-label">Overdue Items</div>
+          </div>
+        </div>
+        <div class="kpi-card" id="kpi-completion">
+          <div class="kpi-icon kpi-icon-purple"><i data-lucide="check-circle-2"></i></div>
+          <div class="kpi-body">
+            <div class="kpi-value" id="kpi-completion-pct">—%</div>
+            <div class="kpi-label">Overall Completion</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel Cards Grid -->
+      <div class="section-heading">
+        <h2>Monitoring Panels</h2>
+        <p>Click a panel to see the full 20-club table</p>
+      </div>
+
+      <div class="panel-grid" id="panel-grid">
+        <!-- Dynamically generated by dashboard.js -->
+      </div>
+
+      <!-- Bottom Row: Recent Activity + Rankings + Deadlines -->
+      <div class="bottom-grid">
+
+        <!-- Recent Activity Feed -->
+        <div class="dash-card activity-card">
+          <div class="dash-card-header">
+            <h3><i data-lucide="activity"></i> Recent Activity</h3>
+          </div>
+          <ul class="activity-list" id="activity-list">
+            <!-- Dynamically populated -->
+          </ul>
+        </div>
+
+        <!-- Club Rankings -->
+        <div class="dash-card rankings-card">
+          <div class="dash-card-header">
+            <h3><i data-lucide="bar-chart-2"></i> Club Rankings</h3>
+            <span class="dash-card-meta">Top performers</span>
+          </div>
+          <ol class="rankings-list" id="rankings-list">
+            <!-- Dynamically populated -->
+          </ol>
+        </div>
+
+        <!-- Deadline Alerts -->
+        <div class="dash-card deadlines-card">
+          <div class="dash-card-header">
+            <h3><i data-lucide="alarm-clock"></i> Upcoming Deadlines</h3>
+          </div>
+          <ul class="deadlines-list" id="deadlines-list">
+            <!-- Dynamically populated -->
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ---- PANEL DETAIL SECTION ---- -->
+    <section class="page-section" id="section-panel-detail">
+
+      <!-- Panel Header -->
+      <div class="panel-detail-header">
+        <button class="back-btn" id="backToDashBtn">
+          <i data-lucide="arrow-left"></i> Back to Dashboard
+        </button>
+        <div class="panel-detail-title-group">
+          <div class="panel-detail-icon" id="panel-detail-icon"></div>
+          <div>
+            <h1 class="panel-detail-title" id="panel-detail-title">Panel Name</h1>
+            <p class="panel-detail-sub" id="panel-detail-sub">All 20 Leo Clubs · 2025–2026</p>
+          </div>
+        </div>
+        <div class="panel-detail-actions">
+          <button class="btn btn-outline-glass" id="panelExportBtn">
+            <i data-lucide="download"></i> Export
+          </button>
+        </div>
+      </div>
+
+      <!-- Panel Stats Row -->
+      <div class="panel-stats-row" id="panel-stats-row">
+        <div class="panel-stat ps-completed">
+          <span class="ps-num" id="ps-completed">—</span>
+          <span class="ps-lbl">Completed</span>
+        </div>
+        <div class="panel-stat ps-pending">
+          <span class="ps-num" id="ps-pending">—</span>
+          <span class="ps-lbl">Pending</span>
+        </div>
+        <div class="panel-stat ps-overdue">
+          <span class="ps-num" id="ps-overdue">—</span>
+          <span class="ps-lbl">Overdue</span>
+        </div>
+        <div class="panel-stat ps-not-started">
+          <span class="ps-num" id="ps-not-started">—</span>
+          <span class="ps-lbl">Not Started</span>
+        </div>
+        <div class="panel-stat ps-completion">
+          <span class="ps-num" id="ps-completion-pct">—%</span>
+          <span class="ps-lbl">District Completion</span>
+        </div>
+      </div>
+
+      <!-- Table Filters -->
+      <div class="table-filters" id="table-filters">
+        <div class="filter-search">
+          <i data-lucide="search"></i>
+          <input type="text" id="club-search" placeholder="Search club..." aria-label="Search clubs">
+        </div>
+        <div class="filter-controls">
+          <select id="status-filter" aria-label="Filter by status">
+            <option value="">All Statuses</option>
+            <option value="completed">Completed</option>
+            <option value="verified">Verified</option>
+            <option value="pending_district">Pending Verification</option>
+            <option value="in_progress">In Progress</option>
+            <option value="submitted">Submitted</option>
+            <option value="correction_required">Correction Required</option>
+            <option value="overdue">Overdue</option>
+            <option value="not_started">Not Started</option>
+          </select>
+          <select id="region-filter" aria-label="Filter by region">
+            <option value="">All Regions</option>
+            <option value="Western">Western</option>
+            <option value="Central">Central</option>
+            <option value="Southern">Southern</option>
+            <option value="Northern">Northern</option>
+            <option value="Eastern">Eastern</option>
+            <option value="North West">North Western</option>
+            <option value="North C.">North Central</option>
+            <option value="Uva">Uva</option>
+            <option value="Sabaragam.">Sabaragamuwa</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 20-Club Data Table -->
+      <div class="table-wrapper">
+        <table class="clubs-table" id="clubs-table" aria-label="Club panel records">
+          <thead>
+            <tr>
+              <th class="col-rank">#</th>
+              <th class="col-club">Club</th>
+              <th class="col-region">Region</th>
+              <th class="col-status">Status</th>
+              <th class="col-progress">Progress</th>
+              <th class="col-updated">Last Updated</th>
+              <th class="col-evidence">Evidence</th>
+              <th class="col-verify">District Verification</th>
+              <th class="col-score">Score</th>
+              <th class="col-action">Action</th>
+            </tr>
+          </thead>
+          <tbody id="clubs-table-body">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+
+    <!-- ---- CLUBS SECTION ---- -->
+    <section class="page-section" id="section-clubs">
+      <div class="welcome-banner">
+        <div class="welcome-text">
+          <h1 class="welcome-heading">Leo Clubs Master List</h1>
+          <p class="welcome-sub">All 20 registered Leo Clubs in the district</p>
+        </div>
+        <button class="btn btn-outline-glass" id="addClubBtn">
+          <i data-lucide="plus"></i> Add Club
+        </button>
+      </div>
+      <div class="clubs-grid" id="clubs-grid">
+        <!-- Dynamically populated -->
+      </div>
+    </section>
+
+    <!-- ---- REPORTS SECTION ---- -->
+    <section class="page-section" id="section-reports">
+      <div class="welcome-banner">
+        <div class="welcome-text">
+          <h1 class="welcome-heading">Reports & Analytics</h1>
+          <p class="welcome-sub">Generate and export district performance reports</p>
+        </div>
+      </div>
+      <div class="reports-grid">
+        <div class="report-card hover-lift" data-report="overall">
+          <div class="report-icon"><i data-lucide="pie-chart"></i></div>
+          <h3>Overall Performance</h3>
+          <p>All 20 clubs across all 10 panels</p>
+          <button class="btn btn-outline-glass btn-sm">Generate PDF</button>
+        </div>
+        <div class="report-card hover-lift" data-report="panel">
+          <div class="report-icon"><i data-lucide="layers"></i></div>
+          <h3>Panel-wise Report</h3>
+          <p>Completion status for each panel</p>
+          <button class="btn btn-outline-glass btn-sm">Generate PDF</button>
+        </div>
+        <div class="report-card hover-lift" data-report="membership">
+          <div class="report-icon"><i data-lucide="user-plus"></i></div>
+          <h3>Membership Growth</h3>
+          <p>Net membership changes this year</p>
+          <button class="btn btn-outline-glass btn-sm">Generate PDF</button>
+        </div>
+        <div class="report-card hover-lift" data-report="overdue">
+          <div class="report-icon"><i data-lucide="alert-triangle"></i></div>
+          <h3>Overdue Activities</h3>
+          <p>All clubs with overdue submissions</p>
+          <button class="btn btn-outline-glass btn-sm">Generate PDF</button>
+        </div>
+        <div class="report-card hover-lift" data-report="projects">
+          <div class="report-icon"><i data-lucide="rocket"></i></div>
+          <h3>Project Performance</h3>
+          <p>Projects, hours, beneficiaries, funds</p>
+          <button class="btn btn-outline-glass btn-sm">Generate PDF</button>
+        </div>
+        <div class="report-card hover-lift" data-report="ranking">
+          <div class="report-icon"><i data-lucide="trophy"></i></div>
+          <h3>Club Rankings</h3>
+          <p>Full performance ranking table</p>
+          <button class="btn btn-outline-glass btn-sm">Generate PDF</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---- SETTINGS SECTION ---- -->
+    <section class="page-section" id="section-settings">
+      <div class="welcome-banner">
+        <div class="welcome-text">
+          <h1 class="welcome-heading">System Settings</h1>
+          <p class="welcome-sub">Configure users, panels, deadlines, and scoring</p>
+        </div>
+      </div>
+      <div class="settings-grid">
+        <div class="setting-card hover-lift">
+          <div class="setting-icon"><i data-lucide="users"></i></div>
+          <h3>User Management</h3>
+          <p>Create, edit, and deactivate user accounts</p>
+          <button class="btn btn-outline-glass btn-sm">Manage Users</button>
+        </div>
+        <div class="setting-card hover-lift">
+          <div class="setting-icon"><i data-lucide="calendar"></i></div>
+          <h3>Leoistic Years</h3>
+          <p>Create new year, lock completed years</p>
+          <button class="btn btn-outline-glass btn-sm">Manage Years</button>
+        </div>
+        <div class="setting-card hover-lift">
+          <div class="setting-icon"><i data-lucide="alarm-clock"></i></div>
+          <h3>Deadlines</h3>
+          <p>Set panel and club-level submission deadlines</p>
+          <button class="btn btn-outline-glass btn-sm">Set Deadlines</button>
+        </div>
+        <div class="setting-card hover-lift">
+          <div class="setting-icon"><i data-lucide="star"></i></div>
+          <h3>Scoring Rules</h3>
+          <p>Configure max scores per panel for this year</p>
+          <button class="btn btn-outline-glass btn-sm">Configure</button>
+        </div>
+        <div class="setting-card hover-lift">
+          <div class="setting-icon"><i data-lucide="shield"></i></div>
+          <h3>Permissions</h3>
+          <p>Role-based access control matrix</p>
+          <button class="btn btn-outline-glass btn-sm">Edit Permissions</button>
+        </div>
+        <div class="setting-card hover-lift">
+          <div class="setting-icon"><i data-lucide="scroll-text"></i></div>
+          <h3>Audit Logs</h3>
+          <p>View complete system audit trail</p>
+          <button class="btn btn-outline-glass btn-sm">View Logs</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================================================
+       RECORD DETAIL & UPDATE MODAL
+  ================================================ -->
+  <dialog class="detail-modal" id="recordModal" closedby="any" aria-labelledby="modalTitle">
+    <div class="modal-content">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h3 id="modalTitle">Update Club Record</h3>
+        <button class="modal-close-btn" id="closeModalBtn" aria-label="Close dialog">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+        <form class="modal-form" id="recordForm">
+          <input type="hidden" id="form-club-idx">
+          <input type="hidden" id="form-panel-key">
+          
+          <!-- Club information header -->
+          <div class="form-info-header">
+            <div>
+              <span class="info-label">Club Name</span>
+              <div class="info-val" id="form-club-name">Leo Club of Colombo Central</div>
+            </div>
+            <div>
+              <span class="info-label">Region</span>
+              <div class="info-val" id="form-club-region">Western</div>
+            </div>
+          </div>
+
+          <div class="form-divider"></div>
+
+          <!-- Dynamic form fields container -->
+          <div id="dynamic-fields-container">
+            <!-- Populated dynamically via JS based on current panel -->
+          </div>
+
+          <div class="form-divider"></div>
+
+          <!-- Common Fields: Status, Progress, Evidence, Remarks -->
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="form-status">Current Status</label>
+              <select class="form-input-select" id="form-status" required>
+                <option value="not_started">Not Started</option>
+                <option value="in_progress">In Progress</option>
+                <option value="submitted">Submitted</option>
+                <option value="pending_district">Pending Verification</option>
+                <option value="correction_required">Correction Required</option>
+                <option value="completed">Completed</option>
+                <option value="verified">Verified</option>
+                <option value="overdue">Overdue</option>
+                <option value="not_applicable">Not Applicable</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="form-progress">Progress %</label>
+              <input type="number" class="form-input-number" id="form-progress" min="0" max="100" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="form-evidence">Evidence Document URL / Proof</label>
+            <input type="text" class="form-input-text" id="form-evidence" placeholder="Enter supporting proof URL">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="form-remarks">Remarks / Corrections Required Reason</label>
+            <textarea class="form-input-textarea" id="form-remarks" rows="3" placeholder="Enter remarks..."></textarea>
+          </div>
+
+          <!-- Submit Buttons -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-glass" id="cancelModalBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="saveRecordBtn">Save Record</button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ================================================
+       LOADING OVERLAY
+  ================================================ -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner-wrap">
+      <div class="loading-logo"><i data-lucide="anchor"></i></div>
+      <div class="loading-ring"></div>
+      <p class="loading-text">Loading Dashboard...</p>
+    </div>
+  </div>
+
+  <!-- Supabase Config & Dashboard Script -->
+  <script src="supabase-config.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>

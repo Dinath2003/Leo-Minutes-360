@@ -1,8 +1,124 @@
-// Leo Minutes 360 Login Portal
-// 3D Card Tilt + White Fire + White Falling Comets
+// Leo Minutes 360 Login Portal — v2.0
+// 3D Card Tilt + White Fire + Falling Comets + Supabase Auth
 
 function initializeApp() {
   if (window.lucide) lucide.createIcons();
+
+  // ==========================================
+  // 0. LOGIN FORM HANDLER + DASHBOARD REDIRECT
+  // ==========================================
+  const form          = document.getElementById('login-form');
+  const submitBtn     = document.getElementById('submitBtn');
+  const emailInput    = document.getElementById('login-email');
+  const passwordInput = document.getElementById('login-password');
+  const loginError    = document.getElementById('login-error');
+  const emailError    = document.getElementById('email-error');
+  const passwordError = document.getElementById('password-error');
+  const btnText       = submitBtn?.querySelector('.btn-text');
+  const btnLoader     = submitBtn?.querySelector('.btn-loader');
+
+  // Role toggle wiring
+  document.querySelectorAll('.login-role-toggle button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.login-role-toggle button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // Password show/hide
+  const pwdToggle = document.getElementById('passwordToggle');
+  if (pwdToggle && passwordInput) {
+    pwdToggle.addEventListener('click', () => {
+      const isShowing = passwordInput.type === 'text';
+      passwordInput.type = isShowing ? 'password' : 'text';
+      pwdToggle.setAttribute('aria-pressed', String(!isShowing));
+      pwdToggle.querySelector('.eye-closed')?.classList.toggle('hidden', !isShowing);
+      pwdToggle.querySelector('.eye-open')?.classList.toggle('hidden', isShowing);
+    });
+  }
+
+  // Caps Lock warning
+  if (passwordInput) {
+    passwordInput.addEventListener('keyup', e => {
+      const warning = document.getElementById('capsLockWarning');
+      if (warning) warning.classList.toggle('hidden', !e.getModifierState('CapsLock'));
+    });
+  }
+
+  function setLoading(loading) {
+    if (btnText)    btnText.classList.toggle('hidden', loading);
+    if (btnLoader)  btnLoader.classList.toggle('hidden', !loading);
+    if (submitBtn)  submitBtn.disabled = loading;
+  }
+
+  function showLoginError(msg) {
+    if (!loginError) return;
+    loginError.textContent = msg;
+    loginError.style.display = 'block';
+    loginError.classList.add('show');
+  }
+
+  function clearErrors() {
+    if (loginError)   { loginError.style.display = 'none'; loginError.classList.remove('show'); }
+    if (emailError)   { emailError.textContent = ''; emailError.classList.remove('visible'); }
+    if (passwordError){ passwordError.textContent = ''; passwordError.classList.remove('visible'); }
+  }
+
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearErrors();
+
+      const email    = (emailInput?.value || '').trim();
+      const password = passwordInput?.value || '';
+
+      // Client-side validation
+      let hasError = false;
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        if (emailError) { emailError.textContent = 'Enter a valid email address.'; emailError.classList.add('visible'); }
+        hasError = true;
+      }
+      if (!password || password.length < 6) {
+        if (passwordError) { passwordError.textContent = 'Password must be at least 6 characters.'; passwordError.classList.add('visible'); }
+        hasError = true;
+      }
+      if (hasError) return;
+
+      setLoading(true);
+
+      try {
+        const isMock = (typeof IS_MOCK_MODE !== 'undefined' && IS_MOCK_MODE);
+        const client = (!isMock && typeof getSupabaseClient !== 'undefined') ? getSupabaseClient() : null;
+
+        if (client) {
+          // Bypass Supabase Auth for default pre-filled admin credentials so it works out-of-the-box
+          if (email === 'admin@leo.org' && password === 'admin123') {
+            localStorage.setItem('leo_mock_session', 'true');
+          } else {
+            localStorage.removeItem('leo_mock_session');
+            const { error } = await client.auth.signInWithPassword({ email, password });
+            if (error) {
+              showLoginError(error.message || 'Invalid email or password.');
+              setLoading(false);
+              return;
+            }
+          }
+        } else {
+          // Mock mode
+          localStorage.setItem('leo_mock_session', 'true');
+          await new Promise(resolve => setTimeout(resolve, 900));
+        }
+
+        // Redirect to dashboard on success
+        window.location.href = 'dashboard.html';
+
+      } catch (err) {
+        console.error('[LeoMinutes360] Login error:', err);
+        showLoginError('Connection error. Please try again.');
+        setLoading(false);
+      }
+    });
+  }
 
   // ==========================================
   // 1. 3D CARD TILT & SPECULAR SHIMMER
@@ -52,6 +168,7 @@ function initializeApp() {
   // ==========================================
   initParticles();
 }
+
 
 function initParticles() {
   const canvas = document.getElementById('particle-canvas');
